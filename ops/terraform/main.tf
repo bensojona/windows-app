@@ -67,7 +67,7 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_security_group" "bastion" {
-  name        = "${var.name}"
+  name        = "${var.name}-bastion"
   vpc_id      = "${aws_vpc.vpc.id}"
   description = "Bastion security group"
 
@@ -121,14 +121,14 @@ resource "aws_instance" "bastion" {
   ami                    = "${module.ami.ami_id}"
   instance_type          = "${var.bastion_instance_type}"
   key_name               = "${aws_key_pair.key.key_name}"
-  subnet_id              = "${element(split(",", var.public_subnets), count.index)}"
+  subnet_id              = "${element(aws_subnet.public.*.id, count.index)}"
   vpc_security_group_ids = ["${aws_security_group.bastion.id}"]
 
   tags { Name = "${var.name}-bastion" }
 }
 
 resource "aws_security_group" "app" {
-  name   = "${var.name}"
+  name   = "${var.name}-app"
   vpc_id = "${aws_vpc.vpc.id}"
   description = "Windows app security group"
 
@@ -161,7 +161,7 @@ resource "aws_instance" "app" {
   ami                    = "ami-f70cdd9c"
   instance_type          = "${var.app_instance_type}"
   key_name               = "${aws_key_pair.key.key_name}"
-  subnet_id              = "${element(split(",", var.public_subnets), count.index)}"
+  subnet_id              = "${element(aws_subnet.public.*.id, count.index)}"
   vpc_security_group_ids = ["${aws_security_group.app.id}"]
 
   tags { Name = "${var.name}-app" }
