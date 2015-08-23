@@ -2,39 +2,31 @@
   "variables": {
     "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
     "aws_secret_key": "{{env `AWS_SECRET_KEY`}}",
-    "atlas_username": "jb_hashicorp",
-    "name":           "windows-test-app",
-    "region":         "us-east-1",
-    "vpc_id":         "vpc-3a71805e",
-    "subnet_id":      "subnet-3be1bc62",
-    "source_ami":     "ami-f70cdd9c",
-    "instance_type":  "t2.micro",
+    "atlas_username": "",
+    "name": "windows-test-app",
+    "region": "us-east-1",
+    "vpc_id": "",
+    "subnet_id": "",
+    "source_ami": "ami-f70cdd9c",
+    "instance_type": "t2.micro",
     "winrm_username": "Administrator",
-    "user_data_file": "packer/scripts/windows/ec2_user_data.ps1",
-    "bastion_host":   "52.5.191.22",
-    "bastion_user":   "ubuntu",
-    "bastion_key":    "terraform/files/windows-test.pem"
+    "user_data_file": "{{template_dir}}/userdata/example.userdata"
   },
   "builders": [
     {
-      "type":            "amazon-ebs",
-      "access_key":      "{{user `aws_access_key`}}",
-      "secret_key":      "{{user `aws_secret_key`}}",
-      "region":          "{{user `region`}}",
-      "vpc_id":          "{{user `vpc_id`}}",
-      "subnet_id":       "{{user `subnet_id`}}",
-      "ssh_private_ip":  false,
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `region`}}",
+      "vpc_id": "{{user `vpc_id`}}",
+      "subnet_id": "{{user `subnet_id`}}",
       "associate_public_ip_address": true,
-      "source_ami":      "{{user `source_ami`}}",
-      "instance_type":   "{{user `instance_type`}}",
-      "communicator":    "winrm",
-      "winrm_username":  "{{user `winrm_username`}}",
-      "winrm_timeout":   "30m",
-      "user_data_file":  "{{user `user_data_file`}}",
-      "ssh_bastion_host": "{{user `bastion_host`}}",
-      "ssh_bastion_username": "{{user `bastion_user`}}",
-      "ssh_bastion_private_key_file": "{{user `bastion_key`}}",
-      "ami_name":        "{{user `name`}} {{timestamp}}",
+      "source_ami": "{{user `source_ami`}}",
+      "user_data_file": "{{user `user_data_file`}}",
+      "instance_type": "{{user `instance_type`}}",
+      "communicator": "winrm",
+      "winrm_username": "{{user `winrm_username`}}",
+      "ami_name": "{{user `name`}} {{timestamp}}",
       "ami_description": "{{user `name`}} AMI",
       "run_tags": {
         "ami-create": "{{user `name`}}"
@@ -47,13 +39,17 @@
   "provisioners": [
     {
       "type": "shell",
-      "script": "packer/scripts/windows/iis.ps1"
+      "scripts": [
+        "{{template_dir}}/scripts/windows/install-webserver.ps1",
+        "{{template_dir}}/scripts/windows/set-ec2config.ps1",
+        "{{template_dir}}/scripts/windows/set-bundleconfig.ps1"
+      ]
     }
   ],
   "post-processors": [
     {
       "type": "atlas",
-      "artifact": "jb_hashicorp/windows-test-app",
+      "artifact": "{{user `atlas_username`}}/{{user `name`}}",
       "artifact_type": "amazon.ami",
       "metadata": {
         "created_at": "{{timestamp}}"
@@ -62,11 +58,10 @@
   ],
   "push": {
     "name": "{{user `atlas_username`}}/{{user `name`}}",
-    "base_dir": "../.",
+    "base_dir": "{{template_dir}}",
     "include": [
-      "{{user `bastion_key`}}",
       "{{user `user_data_file`}}",
-      "packer/scripts/windows/*"
+      "{{template_dir}}/scripts/windows/*"
     ],
     "vcs": false
   }
