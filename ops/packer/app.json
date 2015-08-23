@@ -38,7 +38,7 @@
   ],
   "provisioners": [
     {
-      "type": "shell",
+      "type": "powershell",
       "scripts": [
         "{{template_dir}}/scripts/windows/install-webserver.ps1",
         "{{template_dir}}/scripts/windows/set-ec2config.ps1",

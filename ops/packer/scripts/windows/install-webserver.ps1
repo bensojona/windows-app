@@ -1,5 +1,8 @@
-# Silence progress bars in PowerShell, which can sometimes feed back annoying XML data to the Packer output.
-# $ProgressPreference = "SilentlyContinue"
+# Silence progress bars in PowerShell, which can sometimes feed back strange
+# XML data to the Packer output.
+$ProgressPreference = "SilentlyContinue"
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
 
 Write-Output "Starting IIS Installation"
 
