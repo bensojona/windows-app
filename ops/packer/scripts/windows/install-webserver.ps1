@@ -8,12 +8,16 @@ Write-Output "Starting IIS Installation"
 
 Import-Module ServerManager
 
+# IIS
+
 # Only needed for .NET 3, .NET 4/4.5 is already installed.
-# Add-WindowsFeature -Name NET-Framework-Core
+#Add-WindowsFeature NET-Framework-Core
 
 Add-WindowsFeature Web-Server -IncludeAllSubFeature
 
 Write-Output "Ended IIS Installation"
+
+# WebDeploy
 Write-Output "Starting WebDeploy Installation"
 
 # Install Microsoft Web Deploy to be able to deploy website packages easily
@@ -23,4 +27,8 @@ $filePath = "$($env:TEMP)\WebDeploy_amd64_en-US.msi"
 (New-Object System.Net.WebClient).DownloadFile($webDeployURL, $filePath)
 
 Start-Process -FilePath msiexec -ArgumentList /i, $filePath, /qn -Wait
+
+# Clean up
+Remove-Item -Force -Path $filePath
+
 Write-Output "Ended WebDeploy Installation"
