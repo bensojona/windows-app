@@ -11,7 +11,7 @@
     "instance_type":  "t2.micro",
     "winrm_username": "Administrator",
     "user_data_file": "packer/scripts/windows/ec2_user_data.ps1",
-    "bastion_host":   "52.5.191.22",
+    "bastion_host":   "52.7.102.165",
     "bastion_user":   "ubuntu",
     "bastion_key":    "terraform/files/windows-test.pem"
   },
