@@ -3,11 +3,11 @@
     "aws_access_key": "{{env `AWS_ACCESS_KEY`}}",
     "aws_secret_key": "{{env `AWS_SECRET_KEY`}}",
     "atlas_username": "highlyunavailable",
-    "name": "windows-test-app",
+    "name": "windows-test-base",
     "region": "us-west-2",
     "vpc_id": "vpc-00936f65",
     "subnet_id": "subnet-edbfb3ab",
-    "source_ami": "{{env `ATLAS_BASE_ARTIFACT_AMAZON_AMI_ID`}}",
+    "source_ami": "ami-c3b3b1f3",
     "instance_type": "t2.micro",
     "winrm_username": "Administrator",
     "user_data_file": "{{template_dir}}/userdata/example.userdata"
@@ -37,6 +37,29 @@
     }
   ],
   "provisioners": [
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{template_dir}}/scripts/windows/install-webserver.ps1",
+        "{{template_dir}}/scripts/windows/install-winupdates.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_command": "powershell \"& {(Get-WmiObject win32_operatingsystem).LastBootUpTime > C:\\ProgramData\\lastboot.txt; Restart-Computer -force}\"",
+      "restart_check_command": "powershell -command \"& {if ((get-content C:\\ProgramData\\lastboot.txt) -eq (Get-WmiObject win32_operatingsystem).LastBootUpTime) {Write-Output 'Waiting for restart'; start-sleep 600} else {Write-Output 'Restart complete'}}\""
+    },
+    {
+      "type": "powershell",
+      "scripts": [
+        "{{template_dir}}/scripts/windows/install-winupdates.ps1"
+      ]
+    },
+    {
+      "type": "windows-restart",
+      "restart_command": "powershell \"& {(Get-WmiObject win32_operatingsystem).LastBootUpTime > C:\\ProgramData\\lastboot.txt; Restart-Computer -force}\"",
+      "restart_check_command": "powershell -command \"& {if ((get-content C:\\ProgramData\\lastboot.txt) -eq (Get-WmiObject win32_operatingsystem).LastBootUpTime) {Write-Output 'Waiting for restart'; start-sleep 600} else {Write-Output 'Restart complete'}}\""
+    },
     {
       "type": "powershell",
       "scripts": [

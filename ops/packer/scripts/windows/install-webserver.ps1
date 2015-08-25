@@ -2,8 +2,6 @@
 # XML data to the Packer output.
 $ProgressPreference = "SilentlyContinue"
 
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Force
-
 Write-Output "Starting IIS Installation"
 
 Import-Module ServerManager

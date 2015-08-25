@@ -1,0 +1,8 @@
+{
+  "atlas_username": "highlyunavailable",
+  "name": "windows-test-app",
+  "region": "us-west-2",
+  "vpc_id": "vpc-00936f65",
+  "subnet_id": "subnet-edbfb3ab",
+  "source_ami": "ami-c3b3b1f3"
+}
